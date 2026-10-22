@@ -2,14 +2,14 @@
 
 An experimental Android cover gallery for comics marked **Have It** in League of Comic Geeks. Android home-screen label: **Rogues Gallery**; repository: `RoguesGallery`.
 
-Current release: **1.0.1**. [Download the signed APK](https://github.com/erickolb/RoguesGallery/releases/latest/download/RoguesGallery.apk).
+Current release: **1.0.2**. [Download the signed APK](https://github.com/erickolb/RoguesGallery/releases/download/v1.0.2/RoguesGallery.apk).
 
 ## Use
 
 1. Sign in on League's own HTTPS page inside the app.
 2. Navigate to your own profile collection, then tap **Load My Collection**.
 3. Wait for the owned-issue import. Collections grouped by series are expanded into their individual owned issues, with progress shown while loading.
-4. The slideshow starts playing automatically (15 seconds per cover), with the cover at full size and controls hidden. Tap the cover to show or hide the title and controls floating over the image; its size stays unchanged. Use the double-arrow Previous/Next controls, or the Play/Pause icon and label to toggle playback. The three-dot options menu includes refresh, credits, and sign out.
+4. The slideshow starts playing automatically (15 seconds per cover), with the cover at full size and controls hidden. Tap the cover to show or hide the title and controls floating over the image; its size stays unchanged. The title and controls fade out after 30 seconds without interaction; tap the cover to show them again. Use the double-arrow Previous/Next controls, or the Play/Pause icon and label to toggle playback. The three-dot options menu includes refresh, credits, and sign out.
 
 Passwords are entered directly into League's WebView; the app does not read or store passwords. League session cookies remain in Android's private WebView storage until sign out. Imported titles and image URLs remain in memory; no server or Docker container is required. Android backup is disabled. Uncached covers require internet access; previously viewed covers can use the private device cache. Rotation preserves the current gallery; process termination requires reloading it.
 

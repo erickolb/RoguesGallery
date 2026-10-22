@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.2 — 2026-10-22
 
 - Fade out the floating title and controls after 30 seconds without interaction; tap the cover to show them again.
 - Keep the controls visible when no covers are enabled.
