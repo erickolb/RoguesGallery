@@ -43,6 +43,25 @@ public class MainActivity extends Activity {
     private String refreshAccount;
     private final Runnable refreshCollection = ()->{if(playing && inGallery())importCollection(true);};
     private Bitmap currentBitmap;
+    private final Runnable hideControls = ()->{
+        if(inGallery() && !collection.isEmpty() && galleryOverlay.getVisibility()==View.VISIBLE){
+            LinearLayout overlay=galleryOverlay;
+            overlay.animate().alpha(0f).setDuration(400).withEndAction(()->overlay.setVisibility(View.GONE));
+        }
+    };
+    private void resetControlsTimeout(){
+        handler.removeCallbacks(hideControls);
+        if(inGallery() && galleryOverlay.getVisibility()==View.VISIBLE){
+            galleryOverlay.animate().cancel();galleryOverlay.setAlpha(1f);
+            if(!collection.isEmpty())handler.postDelayed(hideControls,30_000L);
+        }
+    }
+    private void setControlsVisible(boolean visible){
+        handler.removeCallbacks(hideControls);galleryOverlay.animate().cancel();galleryOverlay.setAlpha(1f);
+        galleryOverlay.setVisibility(visible || collection.isEmpty()?View.VISIBLE:View.GONE);
+        resetControlsTimeout();
+    }
+    @Override public void onUserInteraction(){super.onUserInteraction();resetControlsTimeout();}
     private final Runnable slideshow = ()->{if(playing)advance(1);};
     @Override public void onCreate(Bundle state) { super.onCreate(state); preferences=new GalleryPreferences(getSharedPreferences("gallery",MODE_PRIVATE)); cache=new CoverCache(new File(getCacheDir(),"covers")); createWebView(); showLogin(); if(Build.VERSION.SDK_INT>=33) ModernBack.register(this,this::handleBack); }
     @android.annotation.TargetApi(33)
@@ -165,7 +184,7 @@ public class MainActivity extends Activity {
         FrameLayout.LayoutParams overlayPosition=new FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM);
         artwork.addView(galleryOverlay,overlayPosition);
         galleryOverlay.setVisibility(View.GONE);
-        cover.setOnClickListener(v->galleryOverlay.setVisibility(galleryOverlay.getVisibility()==View.VISIBLE?View.GONE:View.VISIBLE));
+        cover.setOnClickListener(v->setControlsVisible(galleryOverlay.getVisibility()!=View.VISIBLE));
         display();
         setPlaying(true);
     }
@@ -196,7 +215,7 @@ public class MainActivity extends Activity {
         int token=++generation;
         handler.removeCallbacks(slideshow);loadingCover=!collection.isEmpty();
         String imageAccount=account;
-        if(collection.isEmpty()){setPlaying(false);cover.setImageDrawable(null); caption.setText("No enabled covers. Open Menu to manage your collection.");galleryOverlay.setVisibility(View.VISIBLE);return;} Cover item=collection.get(index);
+        if(collection.isEmpty()){setPlaying(false);cover.setImageDrawable(null); caption.setText("No enabled covers. Open Menu to manage your collection.");setControlsVisible(true);return;} Cover item=collection.get(index);
         caption.setText(item.title+" · "+(index+1)+" / "+collection.size());
         cover.setContentDescription(item.title);
         images.execute(()->{
@@ -233,7 +252,7 @@ public class MainActivity extends Activity {
             animation.start();
         }else if(outgoing!=null)outgoing.recycle();
     }
-    private void stopPlayback(){if(backgroundImport && importing){cancelImport();refreshSchedule.failed(SystemClock.elapsedRealtime());}setPlaying(false);finishTransition();getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(0);}
+    private void stopPlayback(){handler.removeCallbacks(hideControls);if(galleryOverlay!=null){galleryOverlay.animate().cancel();galleryOverlay.setAlpha(1f);}if(backgroundImport && importing){cancelImport();refreshSchedule.failed(SystemClock.elapsedRealtime());}setPlaying(false);finishTransition();getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(0);}
     private void acceptCollection(JSONObject result) throws JSONException {
         String incomingAccount=result.getString("accountId");
         if(backgroundImport && (!account.equals(refreshAccount) || !account.equals(incomingAccount)))throw new JSONException("Account changed during refresh");
@@ -348,6 +367,6 @@ public class MainActivity extends Activity {
     @android.annotation.SuppressLint("GestureBackNavigation")
     @Override public void onBackPressed(){handleBack();}
     @Override protected void onPause(){super.onPause();stopPlayback();CookieManager.getInstance().flush();}
-    @Override protected void onResume(){super.onResume();if(inGallery()){getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(5894);}}
+    @Override protected void onResume(){super.onResume();if(inGallery()){getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);getWindow().getDecorView().setSystemUiVisibility(5894);resetControlsTimeout();}}
     @Override protected void onDestroy(){generation++;importing=false;finishTransition();handler.removeCallbacksAndMessages(null);images.shutdownNow();league.destroy();super.onDestroy();}
 }

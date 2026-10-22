@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Fade out the floating title and controls after 30 seconds without interaction; tap the cover to show them again.
+- Keep the controls visible when no covers are enabled.
+
 ## 1.0.1 — 2026-10-14
 
 - Refresh collection issue data in the background after every 12 hours of active slideshow playback.
