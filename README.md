@@ -1,5 +1,8 @@
 # Rogues Gallery
 
+> [!WARNING]
+> **Project discontinued.** League of Comic Geeks (LCG) will ban users who use this tool for data scraping. **Do not use Rogues Gallery with your LCG account.** This project is no longer maintained.
+
 An experimental Android cover gallery for comics marked **Have It** in League of Comic Geeks. Android home-screen label: **Rogues Gallery**; repository: `RoguesGallery`.
 
 Current release: **1.0.2**. [Download the signed APK](https://github.com/erickolb/RoguesGallery/releases/download/v1.0.2/RoguesGallery.apk).
